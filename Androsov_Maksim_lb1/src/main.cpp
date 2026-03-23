@@ -11,6 +11,13 @@ vector<vector<bool>> field;
 vector<tuple<int,int,int>> ans_figures;
 int best = INT_MAX;
 long long ways = 0;
+int depth = 0;
+
+#ifdef DEBUG 
+    bool DEBUG_MODE = true;
+#else
+    bool DEBUG_MODE = false;
+#endif
 
 pair<int,int> free_cell(const vector<vector<bool>>& board)
 {
@@ -74,19 +81,26 @@ int get_remained(int x, int y)
 
 void backtrack(vector<tuple<int,int,int>>& figures)
 {
-    if ((int)figures.size() >= best)
+    depth++;
+    if(DEBUG_MODE) cerr << "\n[new function call] depth: "<<depth << "\n"; 
+    if ((int)figures.size() >= best){
+        if(DEBUG_MODE) cerr << "Pruned by upper bound: " << (int)figures.size() << " >= "<< best << "\n";
         return;
+    }
 
 
     auto [x, y] = free_cell(field);
+    if(DEBUG_MODE) cerr << "New free cell: "<< x+1 << " " << y+1 << "\n";
 
     if(x == -1){
         if ((int)figures.size() < best){
             best = (int)figures.size();
             ans_figures = figures;
             ways = 1;
+            if(DEBUG_MODE) cerr << "found best solution: " << best << "\n"; 
         }
         else if((int)figures.size() == best){
+            if(DEBUG_MODE) cerr << "found another best solution " << best << "\n";
             ways++;
         }
         return;
@@ -94,18 +108,25 @@ void backtrack(vector<tuple<int,int,int>>& figures)
     
     int remained_cells = get_remained(x,y); 
     int max_size = max_square_size(field, x, y);
-    if (ceil(remained_cells / (max_size * max_size)) + figures.size() >= best) return;
+    int lower_bound = ceil(remained_cells / (max_size * max_size));
+    if (lower_bound + figures.size() >= best){
+        if(DEBUG_MODE) cerr << "Pruned by lower bound: " << lower_bound + figures.size() << " >= "<< best << "\n";
+        return;
+    }
 
 
     for(int size = max_size; size >= 1; size--){
         if(fits(field, x, y, size)){
             place(field, x, y, size, true);
             figures.push_back({x + 1, y + 1, size});
+            if(DEBUG_MODE) cerr << "added figure " << x+1 <<" " << y+1 << " "<< size << "\n";
 
             backtrack(figures);
+            depth--;
 
             figures.pop_back();
             place(field, x, y, size, false);
+            if(DEBUG_MODE) cerr << "removed figure " << x+1 <<" " << y+1 << " "<< size << "\n";
         }
     }
 }
@@ -131,6 +152,7 @@ int get_greedy(vector<tuple<int,int,int>>& greedy_figures)
 
 int main()
 {
+    cout << "enter n and m\n";
     cin >> n >> m;
     if(n > m) swap(n, m);
 
@@ -138,6 +160,15 @@ int main()
 
     vector<tuple<int,int,int>> greedy_figures;
     best = get_greedy(greedy_figures);
+    if(DEBUG_MODE){
+        cerr << "Gready way(upper bound) \n";
+        cerr << "Minimal figures: " << best << "\n";
+        cerr << "figures: \n";
+        for(auto& [x,y,w]: greedy_figures){
+            cerr <<  x << " " << y << " " << w << "\n";
+        }
+        cerr << "\n[Main function]\n";
+    }
     ans_figures = greedy_figures;
 
     vector<tuple<int,int,int>> figures;
