@@ -10,9 +10,7 @@ def prefix_func(p):
             j += 1
         arr[i] = j
 
-    print("\n prefix array")
-    print(*arr)
-    print(" ")
+    print("\nPrefix array:", arr)
     return arr
 
 
@@ -25,30 +23,33 @@ def kmp_search(p, t):
     j = 0
     for i in range(n):
         print(f"i={i}, j={j}, t[i]='{t[i]}', p[j]='{p[j]}'")
+
         while j > 0 and t[i] != p[j]:
             j = arr[j - 1]
-            print(f"  j shifted to {j}")
+            print(f"  → j shifted to {j}")
 
         if t[i] == p[j]:
             j += 1
-            print(f"  match, j={j}")
+            print(f"  → match, j={j}")
         else:
-            print(f"  no match")
+            print(f"  → no match")
 
         if j == m:
-            ans.append(i - m + 1)
-            print(f"  found match at index {i - m + 1}")
+            match_index = i - m + 1
+            ans.append(match_index)
+            print(f"Found match at index {match_index}")
             j = arr[j - 1]
-            print(f"  j reset to {j}")
+            print(f"j reset to {j}")
 
     return ans
 
 
 if __name__ == "__main__":
-    p = input().strip()
-    t = input().strip()
+    p = input("Pattern: ").strip()
+    t = input("Text: ").strip()
     ans = kmp_search(p, t)
+
     if len(ans) == 0:
         print(-1)
     else:
-        print(",".join(map(str, ans)))
+        print("Matches at:", ",".join(map(str, ans)))
