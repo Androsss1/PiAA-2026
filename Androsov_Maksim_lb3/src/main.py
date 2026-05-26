@@ -4,7 +4,6 @@ def minDistance(
     n = len(word1)
     m = len(word2)
 
-    # Для удобства делаем word1 короче
     if m < n:
         n, m = m, n
         word1, word2 = word2, word1
@@ -31,8 +30,6 @@ def minDistance(
                 print(f"  dp[{i}][{j}] = dp[{i - 1}][{j - 1}] = {dp[i][j]}")
             else:
                 print(f"Символы НЕ совпали")
-
-                # Вычисляем все варианты
                 changed = float("inf")
                 if j > 1:
                     changed = change + dp[i - 1][j - 2]
@@ -57,8 +54,6 @@ def minDistance(
 
 
 def print_matrix(dp, s1, s2):
-    """Аккуратный вывод матрицы"""
-    # Заголовок
     print("\n     ", end="")
     for j, ch in enumerate(" " + s2):
         print(f"{ch:^5}", end="")
